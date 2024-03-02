@@ -3,7 +3,7 @@
 #Include %A_ScriptDir%\Gdip.ahk
 #SingleInstance force
 
-	;Linked to Git
+	;Linked to Gits
 	;Define Global variables to be used between functions / gui
 		;variables for Gui
 global PriestState, PwsToggle, HfToggle, HunterState, AspCheeta, DruidState
