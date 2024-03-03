@@ -1,6 +1,4 @@
 ﻿#MaxThreadsPerHotkey 3
-#Persistent
-#Include %A_ScriptDir%\Gdip.ahk
 #SingleInstance force
 
 	;Linked to Gits
