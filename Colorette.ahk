@@ -132,7 +132,7 @@ HexToRGB(Color, Mode="") ; Input: 6 characters HEX-color. Mode can be RGB, Messa
    else
       Out := R . G . B ; Returns 255255255
 
-	Clipboard := OutMsg
+
     return Out
 }
 

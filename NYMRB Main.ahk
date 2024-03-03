@@ -10,7 +10,7 @@
 global PriestState, PwsToggle, HfToggle, HunterState, AspCheeta, DruidState
 global DebugOption, KillOpt, SpamOpt, KickOpt
 global originalTexts := {} ; An associative array to store original checkbox labels
-
+global clipboardContent := clipboard
 		;variables for priest pixels
 global probeColorCC, probeColorHP25, probeColorHP20, probeColorHP65, probeColorTHP, probeColorPEN, probeColorSWP, probeColorVP, probeColorFT, probeColorPWS, probeColorSHT, probeColorRNW, probeColorHF, probeColorCAST, probeColorIF, probeColorHUM
 
@@ -31,23 +31,25 @@ Gui, Add, Checkbox, x12 y29 w40 h20 vKillOpt, KoS
 Gui, Add, Checkbox, x63 y29 w45 h20 vSpamOpt gUpdateState, Spam
 Gui, Add, Checkbox, x122 y29 w45 h20 vKickOpt, Kick
 Gui, Add, Checkbox, x12 y49 w40 h20 vOption4, Opt 4
-Gui, Add, Text, x70 y52 w60 h15 gCopyWeakAura +Border, ` `Weak Aura
+Gui, Add, Text, x62 y52 w52 h15 gCopyWeakAura +Border, ` `Copy WA
+; Add a button to open Colorette
+Gui, Add, Text, x23 y72 w57 h15 gOpenColorette +Border, ` `Color Find
+Gui, Add, Text, x85 y72 w63 h15 gSetBackGround +Border, ` `Set BG Hex
 
 originalTexts["PriestState"] := "Priest Rotation"
-Gui, Add, Checkbox, x35 y80 w100 h20 vPriestState gToggleBold, % originalTexts["PriestState"]
-Gui, Add, Checkbox, x10 y100 w85 h20 vPwsToggle, Power Shield
-Gui, Add, Checkbox, x100 y100 w65 h20 vHfToggle, HolyFire
-Gui, Add, GroupBox, x5 y73 w165 h50 , 
+Gui, Add, Checkbox, x35 y100 w100 h20 vPriestState gToggleBold, % originalTexts["PriestState"]
+Gui, Add, Checkbox, x10 y120 w85 h20 vPwsToggle, Power Shield
+Gui, Add, Checkbox, x100 y120 w65 h20 vHfToggle, HolyFire
+Gui, Add, GroupBox, x5 y93 w165 h50 , 
 originalTexts["HunterState"] := "Hunter Rotation"
-Gui, Add, Checkbox, x35 y130 w100 h20 vHunterState gToggleBold, % originalTexts["HunterState"]
-Gui, Add, Checkbox, x10 y150 w85 h20 vAspCheeta, Cheetah
-Gui, Add, GroupBox, x5 y123 w165 h50 , 
+Gui, Add, Checkbox, x35 y150 w100 h20 vHunterState gToggleBold, % originalTexts["HunterState"]
+Gui, Add, Checkbox, x10 y170 w85 h20 vAspCheeta, Cheetah
+Gui, Add, GroupBox, x5 y143 w165 h50 , 
 originalTexts["DruidState"] := "Druid Rotation"
-Gui, Add, Checkbox, x35 y180 w100 h20 vDruidState gToggleBold, % originalTexts["DruidState"]
-Gui, Add, GroupBox, x5 y173 w165 h50 , 
+Gui, Add, Checkbox, x35 y200 w100 h20 vDruidState gToggleBold, % originalTexts["DruidState"]
+Gui, Add, GroupBox, x5 y193 w165 h50 , 
 
-; Add a button to open Colorette
-Gui, Add, Button, x12 y200 w100 h20 gOpenColorette, Pick a Color
+
 
 Gui, Font, s12 ; Change the font size to 12
 Gui +LastFound +ToolWindow +E0x80000 ; WS_EX_LAYERED extended style
@@ -504,7 +506,7 @@ Loop {
         	return 0 ; The active window is not World of Warcraft
 	    
 	}
-
+	
 
 	; Subrutines start here
    ; To save the GUI window position to the registry
@@ -579,6 +581,11 @@ Loop {
 		; Dynamically include Colorette script
 		FileAppend, % "#Include " A_ScriptDir "\Colorette.ahk`n", *
 		Run "Colorette.ahk"
+	return
+	SetBackGround:
+	clipboardContent := RTrim(Clipboard) ; Removes trailing whitespace
+		Gui, Color, %clipboardContent% ; Set GUI background color	
+		;MsgBox, +%Clipboard%+ +%clipboardContent%+
 	return
 
 	RemoveToolTip:
