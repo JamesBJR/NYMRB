@@ -1,6 +1,7 @@
 ﻿#MaxThreadsPerHotkey 3
 #Persistent
 #Include %A_ScriptDir%\Gdip.ahk
+;#Include %A_ScriptDir%\Colorette.ahk
 #SingleInstance force
 
 	;Linked to Gits
@@ -21,7 +22,7 @@ global probeColorCC, probeColorHP25, probeColorHP20, probeColorHP65, probeColorC
 
 Gui, +AlwaysOnTop -MaximizeBox +Theme ; Add +AlwaysOnTop option to make the GUI window always on top
 ; Add DropDownList for Debug options
-Gui, Add, DropDownList, x2 y4 w80 vDebugOption Choose1, Debug Off|PriestBug|HunterBug|DruidBug 
+;Gui, Add, DropDownList, x2 y4 w80 vDebugOption Choose1, Debug Off|PriestBug|HunterBug|DruidBug 
 
 ; Add a slider for transparency control
 Gui, Add, Slider, x87 y4 w80 h20 vTransparency gUpdateTransparency Range25-255, 175
@@ -45,10 +46,14 @@ originalTexts["DruidState"] := "Druid Rotation"
 Gui, Add, Checkbox, x35 y180 w100 h20 vDruidState gToggleBold, % originalTexts["DruidState"]
 Gui, Add, GroupBox, x5 y173 w165 h50 , 
 
+; Add a button to open Colorette
+Gui, Add, Button, x12 y200 w100 h20 gOpenColorette, Pick a Color
+
 Gui, Font, s12 ; Change the font size to 12
 Gui +LastFound +ToolWindow +E0x80000 ; WS_EX_LAYERED extended style
 Gui, Color, FFFFFF ; Set GUI background color to white
 WinSet, Transparent, 175 ; Set transparency level (0-255)
+
 
 
 GuiOpen:
@@ -569,6 +574,12 @@ Loop {
 			SetTimer, RemoveToolTip, -1000
 		}
 	Return
+
+	OpenColorette:
+		; Dynamically include Colorette script
+		FileAppend, % "#Include " A_ScriptDir "\Colorette.ahk`n", *
+		Run "Colorette.ahk"
+	return
 
 	RemoveToolTip:
     	ToolTip ; This will clear the tooltip
