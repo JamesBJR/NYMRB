@@ -4,22 +4,28 @@
 	;Linked to Gits
 	;Define Global variables to be used between functions / gui
 		;variables for Gui
-global PriestState, PwsToggle, HfToggle, HunterState, AspCheeta, DruidState
+global PriestState, PwsToggle, HfToggle, HunterState, AspCheeta, DruidState, FeralState, BearState, CatState
 global DebugOption, KillOpt, SpamOpt, KickOpt
 global originalTexts := {} ; An associative array to store original checkbox labels
 global clipboardContent := clipboard
-		;variables for priest pixels
-global probeColorCC, probeColorHP25, probeColorHP20, probeColorHP65, probeColorTHP, probeColorPEN, probeColorSWP, probeColorVP, probeColorFT, probeColorPWS, probeColorSHT, probeColorRNW, probeColorHF, probeColorCAST, probeColorIF, probeColorHUM
+; Shared Variables for Priest, Hunter, and Druid pixels
+global probeColorCC, probeColorHP25, probeColorHP20, probeColorHP65, probeColorTHP, probeColorCAST
 
-	;variables for Hunter pixels
-global probeColorCC, probeColorHP25, probeColorHP20, probeColorHP65, probeColorTHP, probeColorRNG, probeColorSRPT, probeColorSHOOT, probeColorMLEE, probeColorRPTR, probeColorARC, probeColorCHIM, probeColorCONC, probeColorTRGT, probeColorASPT, probeColorPHP, probeColorCAST, probeColorHSTL, probeColorMONG, probeColorLION, probeColorKILL, probeColorWEAP
+; Variables specific to Priest
+global probeColorPEN, probeColorSWP, probeColorVP, probeColorFT, probeColorPWS, probeColorSHT, probeColorRNW, probeColorHF, probeColorIF, probeColorHUM
 
-	;variables for Druid pixels
-global probeColorCC, probeColorHP25, probeColorHP20, probeColorHP65, probeColorCAST, probeColorTHP, probeColorWRATH, probeColorMOON, probeColorWILD, probeColorFURY, probeColorSUN, probeColorSTAR, probeColorTHORN
+; Variables specific to Hunter
+global probeColorRNG, probeColorSRPT, probeColorSHOOT, probeColorMLEE, probeColorRPTR, probeColorARC, probeColorCHIM, probeColorCONC, probeColorTRGT, probeColorASPT, probeColorPHP, probeColorHSTL, probeColorMONG, probeColorLION, probeColorKILL, probeColorWEAP
+
+; Variables specific to Druid
+global probeColorWRATH, probeColorMOON, probeColorWILD, probeColorFURY, probeColorSUN, probeColorSTAR, probeColorTHORN
+;Variables specific for FeralState
+
+
 
 Gui, +AlwaysOnTop -MaximizeBox +Theme ; Add +AlwaysOnTop option to make the GUI window always on top
 ; Add DropDownList for Debug options
-Gui, Add, DropDownList, x2 y4 w80 vDebugOption Choose1, Debug Off|PriestBug|HunterBug|DruidBug 
+Gui, Add, DropDownList, x2 y4 w80 vDebugOption Choose1, Debug Off|PriestBug|HunterBug|DruidBug|FeralBug
 
 ; Add a slider for transparency control
 Gui, Add, Slider, x87 y4 w80 h20 vTransparency gUpdateTransparency Range25-255, 175
@@ -44,7 +50,13 @@ Gui, Add, Checkbox, x10 y170 w85 h20 vAspCheeta, Cheetah
 Gui, Add, GroupBox, x5 y143 w165 h50 , 
 originalTexts["DruidState"] := "Druid Rotation"
 Gui, Add, Checkbox, x35 y200 w100 h20 vDruidState gToggleBold, % originalTexts["DruidState"]
-Gui, Add, GroupBox, x5 y193 w165 h50 , 
+originalTexts["FeralState"] := "Feral Rotation"
+Gui, Add, Checkbox, x35 y220 w100 h20 vFeralState gToggleBold, % originalTexts["FeralState"]
+Gui, Add, GroupBox, x5 y193 w165 h70 , 
+; Add Radio Buttons for Bear or Cat under FeralState
+Gui, Add, Radio, x20 y243 vBearState, Bear
+Gui, Add, Radio, x100 y243 vCatState, Cat
+
 
 
 
@@ -64,12 +76,12 @@ LoadGuiPositionFromRegistry()
 Loop {
 	Start:
 	GetGuiStates()
-	if (((PriestState + HunterState + DruidState) = 0 )) {			
+	if (((PriestState + HunterState + DruidState + FeralState) = 0 )) {			
 		Goto, Start
 		Sleep 500
 	}
 	
-	if ((PriestState + HunterState + DruidState) >= 2 ){		;Idiot prevention if 2 or more variables are true then fuck off
+	if ((PriestState + HunterState + DruidState + FeralState) >= 2 ){		;Idiot prevention if 2 or more variables are true then fuck off
 		GuiControl,, KillOpt, 0 
 		GuiControl,, PriestState, 0 
 		GuiControl,, HfToggle, 0 
@@ -77,6 +89,9 @@ Loop {
 		GuiControl,, HunterState, 0 
 		GuiControl,, AspCheeta, 0
 		GuiControl,, DruidState, 0
+		GuiControl,, FeralState, 0
+		GuiControl,, BearState, 0
+		GuiControl,, CatState, 0
 
 		ResetCheckboxNames()
 		Sleep 500
@@ -266,6 +281,41 @@ Loop {
 		}
 		
 	}
+
+	If(FeralState = 1){
+		FeralStart:
+		GetGuiStates()
+		Random, rand, 150, 300
+		GetColorFeral()
+		Sleep, rand
+
+
+			
+			; Cast order in and out of combat
+		if (probeColorCAST="0xE8D8FF") { ;casting check
+			Goto, FeralStart	
+		} 
+		
+		if (probeColorCC="0x1705FF" || KillOpt=1) { ;main combat check, if combat use rotation53
+			if (probeColorCAST="0xE8D8FF") { ;casting check
+				Goto, FeralStart	
+			} 
+		}
+		
+		if (probeColorCC!="0x1705FF") { ;out of combat check
+			if (probeColorCAST="0xE8D8FF") { ;casting check
+				Goto, FeralStart	
+			}else if (probeColorWILD="0x991569") {
+				Send, =
+				Sleep, rand
+			} else if (probeColorTHORN="0x35E3DA") {
+				Send, - 
+				Sleep, rand
+		}
+		}
+		
+	}
+	}
 	
 	
 	
@@ -367,6 +417,17 @@ Loop {
             . "probeColorSTAR: " . probeColorSTAR . "`n"
             . "probeColorTHORN: " . probeColorTHORN
 		MsgBox, 0, Druid Colors, %DruidString%
+
+		Case "FeralBug":
+		GetColorFeral()
+		FeralString := "probeColorCC: " . probeColorCC . "`n"
+            . "probeColorHP25: " . probeColorHP25 . "`n"
+            . "probeColorHP20: " . probeColorHP20 . "`n"
+            . "probeColorHP65: " . probeColorHP65 . "`n"
+            . "probeColorCAST: " . probeColorCAST . "`n"
+            . "probeColorTHP: " . probeColorTHP . "`n"
+
+		MsgBox, 0, Feral Colors, %FeralString%
 	}
 	
 	Return
@@ -445,6 +506,14 @@ Loop {
 		PixelGetColor, probeColorTHORN, 1339, 920 ;35E3DA
 		Sleep, 100
 	}
+	GetColorFeral() {
+		PixelGetColor, probeColorCC, 1251, 920 ;CombatCheck
+		PixelGetColor, probeColorHP25, 1442, 920 ;HP25% warning
+		PixelGetColor, probeColorHP20, 1462, 920 ;HP20% warning
+		PixelGetColor, probeColorHP65, 1478, 920 ;HP65% warning
+		PixelGetColor, probeColorCAST, 1270, 920 ;Casting check
+		PixelGetColor, probeColorTHP, 1496, 920 ;target HP lower then 45 warning 00A9FF
+	}
 	GetGuiStates(){
 	;refresh states from Gui to script
 		GuiControlGet, KillOpt
@@ -455,6 +524,9 @@ Loop {
 		GuiControlGet, HfToggle
 		GuiControlGet, HunterState
 		GuiControlGet, SpamOpt
+		GuiControlGet, FeralState
+		GuiControlGet, BearState
+		GuiControlGet, CatState
 	}
 	
 	
