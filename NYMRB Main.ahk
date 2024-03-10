@@ -315,11 +315,11 @@ Loop {
 		}
 		
 	}
-	}
-	
-	
-	
 }
+	
+	
+	
+
 
 ;HotKeys start Here
 	;Spam Num keys
